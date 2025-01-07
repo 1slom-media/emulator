@@ -84,9 +84,17 @@ export class ApplicationIdeaEntity {
   @IsString()
   expire: string;
 
+  @Column({ type: 'boolean', nullable: true })
+  @IsString()
+  isUzcard: boolean;
+
   @Column({ type: 'varchar', nullable: true })
   @IsString()
   schedule_file: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  @IsString()
+  period: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;

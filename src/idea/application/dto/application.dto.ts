@@ -104,6 +104,54 @@ export class IdeaCardInfoDto {
   expire: string;
 }
 
+// myId dto
+export class IdeaMyIdDto {
+  @ApiProperty({ description: 'Application ID' })
+  @IsString()
+  application_id: string;
+
+  @ApiProperty({ description: 'Card number', example: '2005-30-01' })
+  @IsString()
+  birth_date: string;
+
+  @ApiProperty({ description: 'Card expiry date', example: 'AD0708282' })
+  @IsString()
+  pass_data: string;
+
+  @ApiProperty({
+    description: 'Card expiry date',
+    example:
+      '/storage/uploads/6/6/pGCnKebH8FEKuwf9dnd7C6sMCFqfTzrO4G9Uybry.jpg',
+  })
+  @IsString()
+  photo: string;
+}
+
+// myId dto
+export class IdeaVerifyCardDto {
+  @ApiProperty({ description: 'Application ID' })
+  @IsString()
+  app_id: string;
+
+  @ApiProperty({ description: 'Otp', example: '777777' })
+  @IsString()
+  otp: string;
+}
+
+// get limit
+export class IdeaGetLimitDto {
+  @ApiProperty({ description: 'Application ID' })
+  @IsString()
+  app_id: string;
+}
+
+// get limit
+export class IdeaGetConfirmOtpDto {
+  @ApiProperty({ description: 'Application ID' })
+  @IsString()
+  app_id: string;
+}
+
 // update
 export class UpdateApplicationIdeaDto extends CreateApplicationIdeaDto {
   @ApiProperty({ description: 'Card number', required: false })
@@ -125,6 +173,11 @@ export class UpdateApplicationIdeaDto extends CreateApplicationIdeaDto {
   @IsOptional()
   @IsString()
   application_id?: string;
+  
+  @ApiProperty({ description: 'Preiod', required: false })
+  @IsOptional()
+  @IsString()
+  period: string;
 
   @ApiProperty({ description: 'ID of the application', readOnly: true })
   @IsNotEmpty()

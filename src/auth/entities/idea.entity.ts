@@ -18,6 +18,10 @@ export class IdeaAuthEntity{
     @IsString()
     access_token: string
 
+    @Column({ type: "varchar",nullable:true })
+    @IsString()
+    model_id: string
+
     @Column({ type: "varchar" })
     @IsString()
     broker_key: string

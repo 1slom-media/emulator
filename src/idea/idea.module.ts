@@ -6,14 +6,21 @@ import { ApplicationService } from './application/application.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApplicationIdeaEntity } from './application/entities/application.entity';
 import { ApiClientModule } from '../api-client/api-client.module';
+import { ProductsModule } from './products/products.module';
+import { PhonesModule } from './phones/phones.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   providers: [IdeaService, ApplicationService],
   controllers: [IdeaController],
   imports: [
+    TypeOrmModule.forFeature([], 'secondary'),
     TypeOrmModule.forFeature([ApplicationIdeaEntity], 'main'),
     ApplicationModule,
-    ApiClientModule
+    ApiClientModule,
+    ProductsModule,
+    PhonesModule,
+    HttpModule
   ],
 })
 export class IdeaModule {}
