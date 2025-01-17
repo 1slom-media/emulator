@@ -16,20 +16,6 @@ import { ApiLogEntity } from './api-client/entities/api-client';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     // main db connection
-
-    // TypeOrmModule.forRoot({
-    //   name: 'main',
-    //   type: 'postgres',
-    //   host: process.env.PG_HOST,
-    //   port: parseInt(process.env.PG_PORT),
-    //   username: process.env.PG_USER,
-    //   password: process.env.PG_PASSWORD,
-    //   database: process.env.PG_DATABASE,
-    //   entities: [IdeaAuthEntity, ApplicationIdeaEntity, ProductIdeaEntity,PhonesIdeaEntity,ApiLogEntity],
-    //   synchronize: true,
-    // }),
-
-    // master db connection
     TypeOrmModule.forRoot({
       name: 'main',
       type: 'postgres',
@@ -40,10 +26,6 @@ import { ApiLogEntity } from './api-client/entities/api-client';
       database: process.env.PG_DATABASE,
       entities: [IdeaAuthEntity, ApplicationIdeaEntity, ProductIdeaEntity,PhonesIdeaEntity,ApiLogEntity],
       synchronize: true,
-      ssl: {
-        rejectUnauthorized: true,
-        ca: process.env.PG_SSL.replace(/\\n/g, '\n'),
-      },
     }),
 
     // nasiya db connection

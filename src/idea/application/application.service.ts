@@ -118,7 +118,8 @@ FROM bin_codes;
         photo: app.photo,
       };
       const isIdenty = await this.verifyMyId(myIdData);
-
+      console.log(isIdenty,"is-iden");
+      
       if (isIdenty) {
         const binCodes = await this.getBinCodes();
 
