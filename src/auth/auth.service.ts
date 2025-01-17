@@ -57,6 +57,11 @@ export class AuthService {
     };
   }
 
+  // findByToken
+  async findByTokenIdea(token: string) {
+    return this.authIdeaRepo.findOneBy({ access_token: token });
+  }
+
   async registerIdea(data: IdeaRegisterDto) {
     const broker = await this.authIdeaRepo.findOneBy({ login: data.login });
     if (broker) {

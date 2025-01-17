@@ -1,5 +1,5 @@
-import { Body, Controller, Post, Res } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ApplicationService } from './application/application.service';
 import {
@@ -13,8 +13,11 @@ import { CreateProductIdeaDto } from './products/dto/product.dto';
 import { ProductsService } from './products/products.service';
 import { PhonesService } from './phones/phones.service';
 import { CreatePhonesIdeaDto } from './phones/dto/phones.dto';
+import { AccessTokenGuard } from '../auth/auth.guard';
 
+@ApiBearerAuth()
 @ApiTags('Idea')
+@UseGuards(AccessTokenGuard)
 @Controller('idea')
 export class IdeaController {
   constructor(
@@ -60,8 +63,9 @@ export class IdeaController {
   }
 
   @ApiOperation({ summary: 'IDEA add product info' })
+  @ApiBody({ type: [CreatePhonesIdeaDto] }) // DTO massivini dokumentatsiyalash
   @Post('/broker/phones')
-  async addPHone(@Body() data: CreatePhonesIdeaDto) {
+  async addPhone(@Body() data: CreatePhonesIdeaDto[]) {
     return this.phonesService.addPhone(data);
   }
 

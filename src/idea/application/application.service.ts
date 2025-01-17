@@ -90,22 +90,25 @@ FROM bin_codes;
         card_expiry: data.expire,
       };
 
+      console.log(body,"bd");
+
       const response = await this.apiService.postApiWithToken(
         '/api/merchants/application/user',
         'IDEA',
         body,
       );
 
+      console.log(response,"res");
+      
       if (!response || response.message !== 'success') {
         return {
           success: false,
           message: 'Failed to update card details',
         };
       }
-
       app.card_number = data.card_number;
       app.expire = data.expire;
-      app.application_id = response.result.application.id;
+      app.application_id = response.result.app.id;
       await this.applicationRepo.save(app);
 
       const myIdData = {
@@ -148,30 +151,29 @@ FROM bin_codes;
   //   3 step MyId verify
   async verifyMyId(data: IdeaMyIdDto) {
     const fullImageUrl = `${process.env.IDEA_ANKETA_HOST}${data.photo}`;
-    return true;
-    // try {
-    //   const base64Image = await convertImageToBase64(fullImageUrl);
-    //   const body = {
-    //     applicationId: data.application_id,
-    //     birth_date: data.birth_date,
-    //     pass_data: data.pass_data,
-    //     photo_from_camera: { front: base64Image },
-    //   };
-
-    //   const response = await this.apiService.postApiWithToken(
-    //     '/application/myid-identify',
-    //     'IDEA',
-    //     body,
-    //   );
-    //   console.log(response, 'ress Id');
-    //   if (response.message === 'Success') {
-    //     return true;
-    //   } else {
-    //     return false;
-    //   }
-    // } catch (error) {
-    //   console.error('Xatolik yuz berdi:', error.message);
-    // }
+    // return true;
+    try {
+      const base64Image = await convertImageToBase64(fullImageUrl);
+      const body = {
+        applicationId: data.application_id,
+        birth_date: data.birth_date,
+        pass_data: data.pass_data,
+        photo_from_camera: { front: base64Image },
+      };
+      const response = await this.apiService.postApiWithToken(
+        '/application/myid-identify',
+        'IDEA',
+        body,
+      );
+      console.log(response, 'ress Id');
+      if (response.status === 'open') {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (error) {
+      console.error('Xatolik yuz berdi:', error.message);
+    }
   }
 
   // 4 step check card and verify 1-chi bank
@@ -188,10 +190,12 @@ FROM bin_codes;
       }
 
       const body = {
-        id: app.application_id,
+        id: parseInt(app.application_id),
         otp: data.otp,
         type: app.isUzcard ? 'uzcard' : 'davr',
       };
+      console.log(body,"bd");
+      
 
       const response = await this.apiService.postApiWithToken(
         `/application/otp?type=${body.type}`,
@@ -238,7 +242,7 @@ FROM bin_codes;
       }
 
       const body = {
-        id: app.application_id,
+        id: parseInt(app.application_id),
         otp: data.otp,
         type: 'davr',
       };
@@ -280,12 +284,15 @@ FROM bin_codes;
       `/application/scoring/${app.application_id}`,
       'IDEA',
     );
+    console.log(response,'res limit');
 
     if (response.limit_amount > 0) {
       const periodSummResponse = await this.apiService.getApi(
-        `/application/period-summ?modelId=129&modelName=merchant&summ=${response.limit_amount}`,
+        `/application/period-summ?modelId=190&modelName=merchant&summ=${response.limit_amount}`,
         'IDEA',
       );
+      console.log(periodSummResponse,"limit");
+      
 
       if (periodSummResponse.statusCode === 200 && periodSummResponse.result) {
         const limit = periodSummResponse.result.map((item) => ({
@@ -306,7 +313,7 @@ FROM bin_codes;
     } else {
       return {
         success: false,
-        reject_reason: response.message || 'No limit available',
+        message: response.message || 'No limit available',
       };
     }
   }
@@ -344,6 +351,7 @@ FROM bin_codes;
       } else {
         return {
           success: true,
+          is_otp: false,
         };
       }
     } catch (error) {

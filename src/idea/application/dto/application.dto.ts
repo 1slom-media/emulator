@@ -24,7 +24,7 @@ export class CreateApplicationIdeaDto {
   @IsString()
   additional_phone: string;
 
-  @ApiProperty({ description: 'Photo URL' })
+  @ApiProperty({ description: 'Photo URL',example:'/image/upload/v1736418916/tbmnbelripys3tkobecg.jpg' })
   @IsNotEmpty()
   @IsString()
   photo: string;

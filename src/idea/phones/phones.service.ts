@@ -11,11 +11,21 @@ export class PhonesService {
     private readonly phonesRepo: Repository<PhonesIdeaEntity>,
   ) {}
 
-  async addPhone(data: CreatePhonesIdeaDto) {
-    const phones = this.phonesRepo.save(data);
-    if (phones) {
+  async addPhone(data: CreatePhonesIdeaDto[]) {
+    // Typing corrected here
+    const savedPhones = [];
+    for (const element of data) {
+      const phone = await this.phonesRepo.save(element); // Saqlashni kutamiz
+      savedPhones.push(phone);
+    }
+
+    if (savedPhones.length > 0) {
       return {
         success: true,
+      };
+    } else {
+      return {
+        success: false,
       };
     }
   }

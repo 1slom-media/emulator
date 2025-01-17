@@ -1,14 +1,18 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import axios, { AxiosInstance } from 'axios';
 import { AuthService } from '../auth/auth.service';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { ApiLogEntity } from './entities/api-client';
 
 @Injectable()
 export class ApiClientService {
   private readonly axiosInstance: AxiosInstance;
-
   constructor(
     @Inject(forwardRef(() => AuthService))
     private readonly authService: AuthService,
+    @InjectRepository(ApiLogEntity, 'main')
+    private readonly apiRepo: Repository<ApiLogEntity>,
   ) {
     this.axiosInstance = axios.create({
       baseURL: process.env.BACKEND_URL,
@@ -26,6 +30,12 @@ export class ApiClientService {
           Authorization: `Bearer ${token}`,
         },
       });
+      const data = {
+        url,
+        brokerType,
+        response:response.data,
+      };
+      await this.apiRepo.save(data);
 
       return response.data;
     } catch (error: any) {
@@ -51,6 +61,14 @@ export class ApiClientService {
         data,
       });
 
+      const body = {
+        url,
+        brokerType,
+        data,
+        response:response.data,
+      };
+      await this.apiRepo.save(body);
+
       return response.data;
     } catch (error: any) {
       const errorMessage =
@@ -70,7 +88,13 @@ export class ApiClientService {
           'Content-Type': 'application/json',
         },
         data,
-      });
+      });   
+      const body = {
+        url,
+        data,
+        response:response.data,
+      };
+      await this.apiRepo.save(body);
 
       return response.data;
     } catch (error: any) {

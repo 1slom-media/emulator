@@ -12,11 +12,12 @@ async function bootstrap() {
     .setTitle('Emulator swagger api documentation')
     .setDescription('The  API description')
     .setVersion('1.0')
+    .addBearerAuth()
     .build();
   const Document = SwaggerModule.createDocument(app, options, {
     include: [],
   });
   SwaggerModule.setup('api', app, Document);
-  await app.listen(3001);
+  await app.listen(3000);
 }
 bootstrap();

@@ -9,9 +9,11 @@ export class CreateProductIdeaDto {
     app_id: string;
   
     @IsString()
+    @IsOptional()
     application_id: string;
 
     @IsString()
+    @IsOptional()
     product_id: string;
   
     @ApiProperty({ description: 'Month' })

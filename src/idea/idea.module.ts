@@ -9,6 +9,7 @@ import { ApiClientModule } from '../api-client/api-client.module';
 import { ProductsModule } from './products/products.module';
 import { PhonesModule } from './phones/phones.module';
 import { HttpModule } from '@nestjs/axios';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   providers: [IdeaService, ApplicationService],
@@ -20,7 +21,8 @@ import { HttpModule } from '@nestjs/axios';
     ApiClientModule,
     ProductsModule,
     PhonesModule,
-    HttpModule
+    HttpModule,
+    AuthModule
   ],
 })
 export class IdeaModule {}

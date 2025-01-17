@@ -18,6 +18,8 @@ export class ProductsService {
   async createProduct(data: CreateProductIdeaDto) {
     try {
       const app = await this.applicationRepo.getOneId(data.app_id);
+      console.log(app,"app");
+      
       if (!app) {
         return {
           success: false,
@@ -30,7 +32,7 @@ export class ProductsService {
       for (const product of data.products) {
         const body = {
           name: product.good_name,
-          price: '',
+          price: product.price,
           amount: product.price,
           count: 1,
           application: app.application_id,
@@ -41,6 +43,7 @@ export class ProductsService {
           'IDEA',
           body,
         );
+        console.log(response,"products");
         if (response.statusCode === true && response.result) {
           const productEntity = new ProductIdeaEntity();
           productEntity.application_id = response.result.application.toString();

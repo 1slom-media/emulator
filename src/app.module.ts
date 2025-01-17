@@ -10,11 +10,26 @@ import { ApiClientModule } from './api-client/api-client.module';
 import { ApplicationIdeaEntity } from './idea/application/entities/application.entity';
 import { ProductIdeaEntity } from './idea/products/entities/product.entity';
 import { PhonesIdeaEntity } from './idea/phones/entities/phones.entity';
+import { ApiLogEntity } from './api-client/entities/api-client';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     // main db connection
+
+    // TypeOrmModule.forRoot({
+    //   name: 'main',
+    //   type: 'postgres',
+    //   host: process.env.PG_HOST,
+    //   port: parseInt(process.env.PG_PORT),
+    //   username: process.env.PG_USER,
+    //   password: process.env.PG_PASSWORD,
+    //   database: process.env.PG_DATABASE,
+    //   entities: [IdeaAuthEntity, ApplicationIdeaEntity, ProductIdeaEntity,PhonesIdeaEntity,ApiLogEntity],
+    //   synchronize: true,
+    // }),
+
+    // master db connection
     TypeOrmModule.forRoot({
       name: 'main',
       type: 'postgres',
@@ -23,9 +38,14 @@ import { PhonesIdeaEntity } from './idea/phones/entities/phones.entity';
       username: process.env.PG_USER,
       password: process.env.PG_PASSWORD,
       database: process.env.PG_DATABASE,
-      entities: [IdeaAuthEntity, ApplicationIdeaEntity, ProductIdeaEntity,PhonesIdeaEntity],
+      entities: [IdeaAuthEntity, ApplicationIdeaEntity, ProductIdeaEntity,PhonesIdeaEntity,ApiLogEntity],
       synchronize: true,
+      ssl: {
+        rejectUnauthorized: true,
+        ca: process.env.PG_SSL.replace(/\\n/g, '\n'),
+      },
     }),
+
     // nasiya db connection
     TypeOrmModule.forRoot({
       name: 'secondary',
