@@ -7,6 +7,7 @@ import {
   IdeaCardInfoDto,
   IdeaGetConfirmOtpDto,
   IdeaGetLimitDto,
+  IdeaMyIdDto,
   IdeaVerifyCardDto,
 } from './application/dto/application.dto';
 import { CreateProductIdeaDto } from './products/dto/product.dto';
@@ -80,6 +81,14 @@ export class IdeaController {
   async verifyOtp(@Body() data: IdeaVerifyCardDto) {
     return this.applicationService.verifyOtp(data);
   }
+
+  // my-id ni test qilish uchun
+  // @ApiOperation({ summary: 'my id or card message' })
+  // @Post('/broker/my-id')
+  // async myId(@Body() data: IdeaMyIdDto) {
+  //   return this.applicationService.verifyMyId(data);
+  // }
+
   @ApiOperation({ summary: 'IDEA get schudele' })
   @Post('/broker/get-contract')
   async schudele(@Body() data: IdeaGetLimitDto, @Res() res: Response) {

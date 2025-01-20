@@ -33,12 +33,18 @@ export class ApiClientService {
       const data = {
         url,
         brokerType,
-        response:response.data,
+        response: response.data,
       };
       await this.apiRepo.save(data);
 
       return response.data;
     } catch (error: any) {
+      const data = {
+        url,
+        brokerType,
+        response: error.response?.data?.message || error.message,
+      };
+      await this.apiRepo.save(data);
       // TypeScript'da error'ni aniqlash
       const errorMessage =
         error.response?.data?.message ||
@@ -65,17 +71,20 @@ export class ApiClientService {
         url,
         brokerType,
         data,
-        response:response.data,
+        response: response.data,
       };
       await this.apiRepo.save(body);
 
       return response.data;
     } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message ||
-        error.message ||
-        'Unknown error occurred';
-      throw new Error(`API request failed: ${errorMessage}`);
+      const body = {
+        url,
+        brokerType,
+        data,
+        response: error.response?.data,
+      };
+      await this.apiRepo.save(body);
+      return error.response?.data;
     }
   }
 
@@ -88,16 +97,22 @@ export class ApiClientService {
           'Content-Type': 'application/json',
         },
         data,
-      });   
+      });
       const body = {
         url,
         data,
-        response:response.data,
+        response: response.data,
       };
       await this.apiRepo.save(body);
 
       return response.data;
     } catch (error: any) {
+      const body = {
+        url,
+        data,
+        response: error.response?.data?.message || error.message,
+      };
+      await this.apiRepo.save(body);
       const errorMessage =
         error.response?.data?.message ||
         error.message ||

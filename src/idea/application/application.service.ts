@@ -14,7 +14,7 @@ import {
 } from './dto/application.dto';
 import { ApiClientService } from '../../api-client/api-client.service';
 import { convertImageToBase64 } from '../../utils/base-format';
-import { maskPhoneNumber } from 'src/utils/mask';
+import { maskPhoneNumber } from '../../utils/mask';
 
 @Injectable()
 export class ApplicationService {
@@ -89,17 +89,12 @@ FROM bin_codes;
         card: data.card_number,
         card_expiry: data.expire,
       };
-
-      console.log(body,"bd");
-
       const response = await this.apiService.postApiWithToken(
         '/api/merchants/application/user',
         'IDEA',
         body,
       );
 
-      console.log(response,"res");
-      
       if (!response || response.message !== 'success') {
         return {
           success: false,
@@ -109,6 +104,7 @@ FROM bin_codes;
       app.card_number = data.card_number;
       app.expire = data.expire;
       app.application_id = response.result.app.id;
+      // app.application_id = response.result.application.id;
       await this.applicationRepo.save(app);
 
       const myIdData = {
@@ -118,18 +114,26 @@ FROM bin_codes;
         photo: app.photo,
       };
       const isIdenty = await this.verifyMyId(myIdData);
-      console.log(isIdenty,"is-iden");
-      
-      if (isIdenty) {
-        const binCodes = await this.getBinCodes();
+      console.log(isIdenty, 'is-iden');
 
+      if (isIdenty.success) {
+        const binCodes = await this.getBinCodes();
         const cardPrefix = data.card_number.substring(0, 4);
         const binCode = binCodes.find((bin: any) => bin.prefix === cardPrefix);
 
-        if (binCode && binCode.card_type === 'uzcard') {
+        if (!binCode) {
+          return {
+            success: false,
+            message: 'Данные карты неверны.',
+            error_type: 'card',
+          };
+        }
+
+        if (binCode.card_type === 'uzcard') {
           app.isUzcard = true;
           await this.applicationRepo.save(app);
         }
+
         return {
           success: true,
           phone: await maskPhoneNumber(app.phone),
@@ -138,7 +142,8 @@ FROM bin_codes;
       } else {
         return {
           success: false,
-          message: 'ID verification failed',
+          message: isIdenty.message,
+          error_type: 'myid',
         };
       }
     } catch (error) {
@@ -152,7 +157,10 @@ FROM bin_codes;
   //   3 step MyId verify
   async verifyMyId(data: IdeaMyIdDto) {
     const fullImageUrl = `${process.env.IDEA_ANKETA_HOST}${data.photo}`;
-    // return true;
+    // return {
+    //   success: true,
+    //   message:"a"
+    // };
     try {
       const base64Image = await convertImageToBase64(fullImageUrl);
       const body = {
@@ -161,16 +169,25 @@ FROM bin_codes;
         pass_data: data.pass_data,
         photo_from_camera: { front: base64Image },
       };
-      const response = await this.apiService.postApiWithToken(
+      const responseApi = await this.apiService.postApiWithToken(
         '/application/myid-identify',
         'IDEA',
         body,
       );
-      console.log(response, 'ress Id');
-      if (response.status === 'open') {
-        return true;
+      const { response } = responseApi;
+      if (responseApi.status === 'open') {
+        return {
+          success: true,
+        };
       } else {
-        return false;
+        const errorMessages =
+          response?.detail
+            ?.map((err: { msg: string }) => err.msg)
+            ?.join(', ') || 'Noma’lum xatolik yuz berdi';
+        return {
+          success: false,
+          message: `ID verification failed : ${errorMessages}`,
+        };
       }
     } catch (error) {
       console.error('Xatolik yuz berdi:', error.message);
@@ -195,8 +212,7 @@ FROM bin_codes;
         otp: data.otp,
         type: app.isUzcard ? 'uzcard' : 'davr',
       };
-      console.log(body,"bd");
-      
+      console.log(body, 'bd');
 
       const response = await this.apiService.postApiWithToken(
         `/application/otp?type=${body.type}`,
@@ -285,15 +301,14 @@ FROM bin_codes;
       `/application/scoring/${app.application_id}`,
       'IDEA',
     );
-    console.log(response,'res limit');
+    console.log(response, 'res limit');
 
     if (response.limit_amount > 0) {
       const periodSummResponse = await this.apiService.getApi(
         `/application/period-summ?modelId=190&modelName=merchant&summ=${response.limit_amount}`,
         'IDEA',
       );
-      console.log(periodSummResponse,"limit");
-      
+      console.log(periodSummResponse, 'limit');
 
       if (periodSummResponse.statusCode === 200 && periodSummResponse.result) {
         const limit = periodSummResponse.result.map((item) => ({
