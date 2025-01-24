@@ -120,4 +120,38 @@ export class ApiClientService {
       throw new Error(`API request failed: ${errorMessage}`);
     }
   }
+
+  async putApiWithToken(url: string, brokerType: string, data: any) {
+    try {
+      const token = await this.authService.getAccessToken(brokerType);
+      const response = await this.axiosInstance({
+        method: 'put',
+        url,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        data,
+      });
+
+      const body = {
+        url,
+        brokerType,
+        data,
+        response: response.data,
+      };
+      await this.apiRepo.save(body);
+
+      return response.data;
+    } catch (error: any) {
+      const body = {
+        url,
+        brokerType,
+        data,
+        response: error.response?.data,
+      };
+      await this.apiRepo.save(body);
+      return error.response?.data;
+    }
+  }
 }

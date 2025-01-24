@@ -32,7 +32,6 @@ export class ProductsService {
       for (const product of data.products) {
         const body = {
           name: product.good_name,
-          price: product.price,
           amount: product.price,
           count: 1,
           application: app.application_id,

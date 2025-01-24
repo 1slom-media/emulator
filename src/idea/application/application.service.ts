@@ -114,9 +114,9 @@ FROM bin_codes;
         photo: app.photo,
       };
       const isIdenty = await this.verifyMyId(myIdData);
-      console.log(isIdenty, 'is-iden');
 
       if (isIdenty.success) {
+        await this.typeB(app.id);
         const binCodes = await this.getBinCodes();
         const cardPrefix = data.card_number.substring(0, 4);
         const binCode = binCodes.find((bin: any) => bin.prefix === cardPrefix);
@@ -304,27 +304,23 @@ FROM bin_codes;
     console.log(response, 'res limit');
 
     if (response.limit_amount > 0) {
-      const periodSummResponse = await this.apiService.getApi(
-        `/application/period-summ?modelId=190&modelName=merchant&summ=${response.limit_amount}`,
-        'IDEA',
-      );
-      console.log(periodSummResponse, 'limit');
+      let limit = [];
 
-      if (periodSummResponse.statusCode === 200 && periodSummResponse.result) {
-        const limit = periodSummResponse.result.map((item) => ({
-          month: item.period,
-          amount: item.value,
-        }));
-
-        return {
-          success: true,
-          limit,
-        };
+      if (response.provider === 'ANORBANK') {
+        limit = [
+          { month: 6, amount: response.limit_amount },
+          { month: 12, amount: response.limit_amount },
+        ];
+      } else if (response.provider === 'DAVRBANK') {
+        limit = [
+          { month: 6, amount: (response.limit_amount / 12) * 6 },
+          { month: 12, amount: response.limit_amount },
+        ];
       }
 
       return {
-        success: false,
-        message: 'Error fetching period-summ data',
+        success: true,
+        limit,
       };
     } else {
       return {
@@ -468,6 +464,41 @@ FROM bin_codes;
         success: false,
         message: 'Error downloading the schedule file',
       });
+    }
+  }
+
+  async typeB(app_id: string) {
+    const app = await this.applicationRepo.findOne({
+      where: { id: app_id },
+    });
+
+    if (!app) {
+      return {
+        success: false,
+        message: 'Application not found',
+      };
+    }
+
+    const body = {
+      categoryType: 'B',
+    };
+
+    const response = await this.apiService.putApiWithToken(
+      `/application/applications/${app.application_id}`,
+      'IDEA',
+      body,
+    );
+
+    if (response?.statusCode === 200 && response?.result?.categoryType) {
+      app.categoryType = response.result.categoryType;
+      await this.applicationRepo.save(app);
+      return {
+        success: true,
+      };
+    } else {
+      return {
+        success: false,
+      };
     }
   }
 }

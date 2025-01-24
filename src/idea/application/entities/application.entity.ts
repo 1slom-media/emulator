@@ -96,6 +96,10 @@ export class ApplicationIdeaEntity {
   @IsString()
   period: string;
 
+  @Column({ type: 'varchar', nullable: true })
+  @IsString()
+  categoryType: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
