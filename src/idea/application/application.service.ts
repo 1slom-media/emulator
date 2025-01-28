@@ -10,6 +10,7 @@ import {
   IdeaGetConfirmOtpDto,
   IdeaGetLimitDto,
   IdeaMyIdDto,
+  IdeaResendOtpDto,
   IdeaVerifyCardDto,
 } from './dto/application.dto';
 import { ApiClientService } from '../../api-client/api-client.service';
@@ -500,5 +501,36 @@ FROM bin_codes;
         success: false,
       };
     }
+  }
+
+  async resendOtp(data: IdeaResendOtpDto) {
+    const app = await this.applicationRepo.findOne({
+      where: { id: data.app_id },
+    });
+
+    if (!app) {
+      return {
+        success: false,
+        message: 'Application not found',
+      };
+    }
+    let type = 'davr';
+    if (app.isUzcard && data.type == '1') {
+      type = 'anor';
+    }
+
+    const response = await this.apiService.getApi(
+      `/application/resend/${app.application_id}?type=${type}`,
+      'IDEA',
+    );
+    
+    if (response.statusCode == 200) {
+      return {
+        success: true,
+      };
+    }
+    return {
+      success: false,
+    };
   }
 }

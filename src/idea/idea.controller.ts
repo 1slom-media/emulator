@@ -8,6 +8,7 @@ import {
   IdeaGetConfirmOtpDto,
   IdeaGetLimitDto,
   IdeaMyIdDto,
+  IdeaResendOtpDto,
   IdeaVerifyCardDto,
 } from './application/dto/application.dto';
 import { CreateProductIdeaDto } from './products/dto/product.dto';
@@ -93,5 +94,11 @@ export class IdeaController {
   @Post('/broker/get-contract')
   async schudele(@Body() data: IdeaGetLimitDto, @Res() res: Response) {
     return this.applicationService.getSchedule(data, res);
+  }
+
+  @ApiOperation({ summary: 'IDEA resend Otp' })
+  @Post('/broker/resend-otp')
+  async sendResendOtp(@Body() data: IdeaResendOtpDto) {
+    return this.applicationService.resendOtp(data);
   }
 }

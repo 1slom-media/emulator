@@ -24,7 +24,10 @@ export class CreateApplicationIdeaDto {
   @IsString()
   additional_phone: string;
 
-  @ApiProperty({ description: 'Photo URL',example:'/image/upload/v1736418916/tbmnbelripys3tkobecg.jpg' })
+  @ApiProperty({
+    description: 'Photo URL',
+    example: '/image/upload/v1736418916/tbmnbelripys3tkobecg.jpg',
+  })
   @IsNotEmpty()
   @IsString()
   photo: string;
@@ -173,7 +176,7 @@ export class UpdateApplicationIdeaDto extends CreateApplicationIdeaDto {
   @IsOptional()
   @IsString()
   application_id?: string;
-  
+
   @ApiProperty({ description: 'Preiod', required: false })
   @IsOptional()
   @IsString()
@@ -193,4 +196,14 @@ export class UpdateApplicationIdeaDto extends CreateApplicationIdeaDto {
   @IsNotEmpty()
   @IsDateString()
   updateAt: Date;
+}
+
+export class IdeaResendOtpDto {
+  @ApiProperty({ description: 'Application ID' })
+  @IsString()
+  app_id: string;
+
+  @ApiProperty({ description: '1 or 2', example: '1' })
+  @IsString()
+  type: string;
 }
