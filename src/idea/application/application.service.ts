@@ -52,6 +52,16 @@ FROM bin_codes;
 `;
     return await reportsRepo.query(query);
   }
+  // aplication db get one
+  async appGetOne(id: string) {
+    const reportsRepo = this.secondaryDataSource.getRepository('applications');
+    const query = `
+        SELECT id, status, state
+        FROM applications WHERE id = $1;
+    `;
+    const result = await reportsRepo.query(query, [id]);
+    return result.length > 0 ? result[0] : null;
+  }
 
   //  1 step create
   async createApp(data: CreateApplicationIdeaDto) {
@@ -302,7 +312,7 @@ FROM bin_codes;
       `/application/scoring/${app.application_id}`,
       'IDEA',
     );
-    console.log(response, 'res limit');
+    const appDB = await this.appGetOne(app.application_id);
 
     if (response.limit_amount > 0) {
       let limit = [];
@@ -314,14 +324,19 @@ FROM bin_codes;
         ];
       } else if (response.provider === 'DAVRBANK') {
         limit = [
-          { month: 6, amount: (response.limit_amount / 12) * 6 },
-          { month: 12, amount: response.limit_amount },
+          { month: 6, amount: String((response.limit_amount / 12) * 6) },
+          { month: 12, amount: String(response.limit_amount) },
         ];
       }
 
       return {
         success: true,
         limit,
+      };
+    } else if (appDB.state == 'failed' || appDB.status!="scoring") {
+      return {
+        success: "fail",
+        message: response.message || 'No limit available',
       };
     } else {
       return {
@@ -523,7 +538,7 @@ FROM bin_codes;
       `/application/resend/${app.application_id}?type=${type}`,
       'IDEA',
     );
-    
+
     if (response.statusCode == 200) {
       return {
         success: true,

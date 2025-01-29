@@ -1,5 +1,19 @@
-import { Body, Controller, Post, Res, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Response } from 'express';
 import { ApplicationService } from './application/application.service';
 import {
@@ -101,4 +115,11 @@ export class IdeaController {
   async sendResendOtp(@Body() data: IdeaResendOtpDto) {
     return this.applicationService.resendOtp(data);
   }
+
+  // aplicationsni bazadan olish uchun
+  // @ApiQuery({ name: 'id', type: String })
+  // @Get('find-one')
+  // async findOneApp(@Query('id') id: string) {
+  //   return this.applicationService.appGetOne(id);
+  // }
 }
