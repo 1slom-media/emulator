@@ -333,9 +333,9 @@ FROM bin_codes;
         success: true,
         limit,
       };
-    } else if (appDB.state == 'failed' || appDB.status!="scoring") {
+    } else if (appDB.state == 'failed' || appDB.status != 'scoring') {
       return {
-        success: "fail",
+        success: 'fail',
         message: response.message || 'No limit available',
       };
     } else {
@@ -546,6 +546,60 @@ FROM bin_codes;
     }
     return {
       success: false,
+    };
+  }
+
+  async rejectApp(data: IdeaGetConfirmOtpDto) {
+    const app = await this.applicationRepo.findOne({
+      where: { id: data.app_id },
+    });
+
+    if (!app) {
+      return {
+        success: false,
+        message: 'Application not found',
+      };
+    }
+
+    const response = await this.apiService.putApiWithToken(
+      `/application/reject/${app.application_id}`,
+      'IDEA',
+      { reject_reason: 'Клиент отказался' },
+    );
+    if (response.reason_of_reject == 'Клиент отказался') {
+      return {
+        success: true,
+      };
+    }
+    return {
+      success: false,
+    };
+  }
+
+  async deleteProductByAppId(data: IdeaGetConfirmOtpDto) {
+    const app = await this.applicationRepo.findOne({
+      where: { id: data.app_id },
+    });
+
+    if (!app) {
+      return {
+        success: false,
+        message: 'Application not found',
+      };
+    }
+
+    const response = await this.apiService.deleteApiWithToken(
+      `/application/reject/${app.application_id}`,
+      'IDEA',
+    );
+    if (response.statusCode == true) {
+      return {
+        success: true,
+      };
+    }
+    return {
+      success: false,
+      message: response.message,
     };
   }
 }

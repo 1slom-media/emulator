@@ -154,4 +154,35 @@ export class ApiClientService {
       return error.response?.data;
     }
   }
+
+  async deleteApiWithToken(url: string, brokerType: string) {
+    try {
+      const token = await this.authService.getAccessToken(brokerType);
+      const response = await this.axiosInstance({
+        method: 'delete',
+        url,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const body = {
+        url,
+        brokerType,
+        response: response.data,
+      };
+      await this.apiRepo.save(body);
+
+      return response.data;
+    } catch (error: any) {
+      const body = {
+        url,
+        brokerType,
+        response: error.response?.data,
+      };
+      await this.apiRepo.save(body);
+      return error.response?.data;
+    }
+  }
 }

@@ -116,6 +116,18 @@ export class IdeaController {
     return this.applicationService.resendOtp(data);
   }
 
+  @ApiOperation({ summary: 'IDEA reject' })
+  @Post('/broker/reject')
+  async rejectApplication(@Body() data: IdeaGetConfirmOtpDto) {
+    return this.applicationService.rejectApp(data);
+  }
+
+  @ApiOperation({ summary: 'IDEA delete product' })
+  @Post('/broker/delete-product')
+  async deleteProduct(@Body() data: IdeaGetConfirmOtpDto) {
+    return this.applicationService.deleteProductByAppId(data);
+  }
+
   // aplicationsni bazadan olish uchun
   // @ApiQuery({ name: 'id', type: String })
   // @Get('find-one')
